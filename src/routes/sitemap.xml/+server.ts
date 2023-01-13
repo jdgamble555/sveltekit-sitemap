@@ -1,35 +1,18 @@
 import type { RequestHandler } from './$types';
-import { SitemapStream, streamToPromise } from 'sitemap';
-import { error } from '@sveltejs/kit';
+import { genSitemap } from '$lib/gen-sitemap';
 
 export const GET: RequestHandler = async ({ url }) => {
 
-    try {
-        const sitemapStream = new SitemapStream({
-            hostname: url.origin, 
-            xmlns: {
-                news: false,
-                xhtml: true,
-                image: true,
-                video: false
-            },
-            xslUrl: 'sitemap.xsl'
-        });
+    const sm = new genSitemap({
+        xsl: 'sitemap.xsl'
+    });
 
-        sitemapStream.write({
-            lastmod: new Date().toISOString(),
-            url: url.origin 
-        });
+    sm.addLink({
+        lastmod: new Date().toISOString(),
+        loc: url.origin
+    });
 
-        sitemapStream.end();
-
-        const sm = (await streamToPromise(sitemapStream)).toString();
-
-        return new Response(sm, {
-            headers: { 'content-type': 'application/xml' }
-        });
-    } catch (e: unknown) {
-        throw error(500, e as Error);
-    }
-
+    return new Response(sm.generate(), {
+        headers: { 'content-type': 'application/xml' }
+    });
 };
