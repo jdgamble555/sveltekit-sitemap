@@ -23,7 +23,7 @@ export interface sitemapTag {
     images?: Optional<string[] | string>;
 };
 
-export class genSitemap {
+export class generateSitemap {
 
     private feed: string[] = [];
     private pretty: boolean;

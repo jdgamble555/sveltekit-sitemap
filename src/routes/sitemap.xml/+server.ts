@@ -1,18 +1,18 @@
 import type { RequestHandler } from './$types';
-import { genSitemap } from '$lib/gen-sitemap';
+import { generateSitemap } from '$lib/generate-sitemap';
 
 export const GET: RequestHandler = async ({ url }) => {
 
-    const sm = new genSitemap({
+    const sitemap = new generateSitemap({
         xsl: 'sitemap.xsl'
     });
 
-    sm.addLink({
+    sitemap.addLink({
         lastmod: new Date().toISOString(),
         loc: url.origin
     });
 
-    return new Response(sm.generate(), {
+    return new Response(sitemap.generate(), {
         headers: { 'content-type': 'application/xml' }
     });
 };
